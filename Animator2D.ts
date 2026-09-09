@@ -195,10 +195,11 @@ export class Animator2D implements OnStart {
 		framerate: number,
 		startFrame: number,
 		endFrame: number,
-		keepAliveOnFinish: boolean,
-		loopOptions?: {
-			loop: boolean;
-			end_timer?: number;
+		options: {
+			loop?: boolean;
+			loopEndTimerSeconds?: number;
+			onEnd?: () => void;
+			aliveOnFinish?: boolean;
 		},
 	) {
 		const fsm = this.fsms.get(identifier);
@@ -207,19 +208,18 @@ export class Animator2D implements OnStart {
 		const blackboard = this.blackboards.get(identifier);
 		if (!blackboard) return;
 
-		if (loopOptions) {
-			blackboard.SetWild("is_looping", loopOptions.loop ?? false);
-			if (loopOptions.end_timer !== undefined) {
-				task.delay(loopOptions.end_timer, () => {
-					blackboard.SetWild("is_looping", false);
-				});
-			}
+		blackboard.SetWild("is_looping", options.loop ?? false);
+		if (options.loopEndTimerSeconds !== undefined) {
+			task.delay(options.loopEndTimerSeconds, () => {
+				blackboard.SetWild("is_looping", false);
+			});
 		}
 
-		blackboard.SetWild("alive_on_finish", keepAliveOnFinish);
+		blackboard.SetWild("alive_on_finish", options.aliveOnFinish ?? false);
 		blackboard.SetWild("framerate", framerate);
 		blackboard.SetWild("start_frame", startFrame);
 		blackboard.SetWild("end_frame", endFrame);
+		blackboard.SetWild("onEnd_Callback", options.onEnd);
 
 		fsm.HandleEvent("play");
 	}
@@ -260,6 +260,11 @@ export class Animator2D implements OnStart {
 
 		const blackboard = this.blackboards.get(identifier);
 		if (!blackboard) return;
+
+		const onEndCallback = blackboard.GetWild("onEnd_Callback") as () => void | undefined;
+		if (onEndCallback) {
+			onEndCallback();
+		}
 
 		const keepAlive = blackboard.GetWildOrDefault<boolean>("alive_on_finish", false);
 		if (keepAlive) {
