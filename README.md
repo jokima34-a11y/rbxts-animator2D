@@ -1,7 +1,7 @@
 # rbxts-animator2D
 A lightweight `rbx-ts` image sequence animator for Roblox. It can be used seamlessly alongside **React** or independently.
 
-# Demo
+# Example
 ```typescript
 import React, { useEffect, useState } from "@rbxts/react";
 import { useAnimator2D } from "./Animator2DProvider";
