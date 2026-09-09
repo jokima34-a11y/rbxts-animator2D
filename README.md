@@ -1,5 +1,5 @@
 # rbxts-animator2D
-A lightweight `rbx-ts` image sequence animator for Roblox. It can be used seamlessly alongside **React** or independently via flamework injection or with slight modifications without. 
+A lightweight `rbx-ts` image sequence animator for Roblox. It can be used seamlessly alongside **React** or independently.
 
 # Demo
 ```typescript
